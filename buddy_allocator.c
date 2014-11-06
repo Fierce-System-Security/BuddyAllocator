@@ -190,12 +190,11 @@ void free(void *ptr)
  * If this did not work, a null pointer is returned
  */
  
- struct mem_buddy *mb
- mem_init(long addr, long order, long min_size){
+struct mem_buddy *mb
+mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
  
- 	struct mem_buddy *mb
-    long i;
-    //Check that the smallest block size can hold a block
+    struct mem_buddy *mb
+    int i = 0;
     
     //Check that the minimum size of block is smaller than the order
     if(min_size > order){
@@ -207,7 +206,7 @@ void free(void *ptr)
     mb->order = order;
     mb->min_size = min_size;
     
-    //Allocate linkedlist for every order until maximum 
+    //Allocate linkedlist for every order
     mp->avail_order = alloc(size_t(struct list_head));
     
     //List should be empty in the beginning
