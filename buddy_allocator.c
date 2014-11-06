@@ -80,6 +80,16 @@ void * alloc(size_t size)
     {
     	//if it's nothing in the freelist
     	//should alloc a new big block for buddy ==> double the size of current buddy
+    	//what about the first time? sbrk?
+    	freelist_head = sbrk(sizeof(struct _metadata));
+    	//shall we alloc heap memory for this linked list? shall we alloc one node at a time or alloc enough memory for all the nodes
+    	freelist_head->ptr = sbrk(size);
+    	freelist_head->size=size;
+    	freelist_head->next = NULL;
+    	chosen = ptr;
+    	
+    	
+    	
     	
     	//otherwise should look for bigger free block and split them until required size
     	
@@ -87,6 +97,7 @@ void * alloc(size_t size)
     	
     	//use bst? or several linked lists with different size?
     }
+    return chosen;
 } 
  
 /*
@@ -136,7 +147,8 @@ size_t next_power_2(size_t size)
  
  boolean availablity(void *block)
  {
- 
+ 	//shall we iterate through the linked list of free blocks to check this,
+ 	//or shall we add a free flag into the metadata
  }
  
  /**
@@ -174,7 +186,12 @@ size_t next_power_2(size_t size)
 void free(void *ptr)
 {
 	if (!ptr)
-		return;
+		return; 
+		
+	//find the block of memory that ptr points to
+	// how do we find the metadata of ptr?
+	
+	//then add metadata of ptr into the linked list
 }
 
 
