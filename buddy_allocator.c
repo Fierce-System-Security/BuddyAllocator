@@ -150,7 +150,12 @@ size_t next_power_2(size_t size)
   *@return
   * Return address of the buddy of the memory block
   */
-  
+ 
+ void findBuddy(struct mem_buddy *mb, size_t size){
+ 	
+ 	//Uses linkedlist containing pair of buddies to locate buddy
+ 	return buddy_addr;
+ }
   
 /**
  * Free a block of memory
