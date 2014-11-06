@@ -207,14 +207,14 @@ mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
     mb->min_size = min_size;
     
     //Allocate linkedlist for every order
-    mp->avail_order = alloc(size_t(struct list_head));
+    mp->avail_blocks = alloc(size_t(struct list_head));
+   
+    //Linked list for pairs of buddies
     
     //List should be empty in the beginning
     for(i=0; i <=order;i++){
-    	INIT_LIST_HEAD(&mb->avail_order[i]);
+    	INIT_LIST_HEAD(&mb->avail_blocks[i]); //Gets and initializes list head * of linkedlist
     }
-    
-    //Allocate both linkedlists
 
 	return mb;
 }
