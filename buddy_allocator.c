@@ -8,6 +8,7 @@
  * and one to manage the pairs of buddies 
  */
 
+/*
 typedef struct _metadata {
     void *ptr;
     size_t size;
@@ -17,8 +18,9 @@ typedef struct _metadata {
 } metadata;
 
 
-metadata * freelist_head = NULL;
 
+metadata * freelist_head = NULL;
+*/
 //where do we store the metadata?  sbrk some memory for it?
 
 /**
@@ -101,6 +103,35 @@ void * alloc(size_t size)
 } 
 
 
+struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
+{
+	
+}
+ 
+/*
+	helper: next power of 2
+	given the request size, return the power of 2 that is immediately bigger than size
+	
+	@param size
+		given size of the memory block
+		
+	@return 
+		the power of 2 that is immediately bigger than size
+*/ 
+
+size_t next_power_2(size_t size)
+{
+	int cursize =1;
+	while(cursize<size)
+		cursize*=2;
+		
+	return cursize;
+	
+	
+	//should we use bitwise operation?
+}
+
+
 
 void * malloc(struct mem_buddy *mb, unsigned long order)
 {
@@ -150,39 +181,17 @@ mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
 	}
 	return NULL;
 }
-
-struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
-{
-	
-}
- 
-/*
-	helper: next power of 2
-	given the request size, return the power of 2 that is immediately bigger than size
-	
-	@param size
-		given size of the memory block
-		
-	@return 
-		the power of 2 that is immediately bigger than size
-*/ 
-
-size_t next_power_2(size_t size)
-{
-	int cursize =1;
-	while(cursize<size)
-		cursize*=2;
-		
-	return cursize;
-	
-	
-	//should we use bitwise operation?
-}
  
  
 /*
 	helper: split
 	split the larger memory block into 2 buddy blocks
+*/
+
+/*
+	helper: Address_index
+	creates an index value in the buddy allocator from the block's address
+	used to find block's availability
 */
 
 unsigned long address_index(struct mem_buddy *mb, struct block *block){
@@ -192,11 +201,20 @@ unsigned long address_index(struct mem_buddy *mb, struct block *block){
     return block_index;
 }
 
-//uses macro set_bit
+/*
+	helper: mark_free
+	the tag bit is set to 1, which makes the block available
+	uses macro _set_bit
+*/
 void mark_free(struct mem_buddy *mb, struct block *block){
 	_set_bit(address_index(mb,block),mb->bit_availability);
 }
 
+/*
+	helper: mark_allocated
+	the tag bit is set to 0, which makes the block allocated
+	uses macro _clear_bit
+*/
 void mark_allocated(struct mem_buddy *mb, struct block *block){
 	_clear_bit(address_index(mb, block), mb->bit_availability);
 }
@@ -216,6 +234,10 @@ void mark_allocated(struct mem_buddy *mb, struct block *block){
  *  been allocated, then false. 
  */
  
+ /*
+	helper: availability
+	if the bit is set (alllocated), returns false. If free, returns true
+*/
  boolean availablity(void *block)
  {
  	return test_bit(address_index(mb,block), mb->bit_availability);
