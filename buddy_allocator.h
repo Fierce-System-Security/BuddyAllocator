@@ -1,3 +1,5 @@
+#include <linux/list.h>
+
 struct mem_buddy{
   unsigned long addr;
   unsigned long order;  
@@ -8,7 +10,7 @@ struct mem_buddy{
   struct list_head *avail_blocks;
   };
   
- struct mem_buddy *
+struct mem_buddy *
 mem_init(
 unsigned long addr,
 unsigned long order,
