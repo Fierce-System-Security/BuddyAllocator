@@ -99,6 +99,62 @@ void * alloc(size_t size)
     }
     return chosen;
 } 
+
+
+
+void * malloc(struct mem_buddy *mb, unsigned long order)
+{
+	if(mp==NULL)
+		return NULL;
+	
+	if(order>mb->order)
+	{
+		//want to alloc a memory that's bigger than our current biggest buddy
+		//alloc a new buddy, merge the two buddies
+		struct mem_buddy *mb2
+mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
+
+		mb = merge(struct mem_buddy *mb, struct mem_buddy *mb2);
+		
+	}
+	if(order<mb->min_size)
+	{
+		order=mb->min_size;
+	}
+	
+	unsigned long i;
+	struct block* block;
+	struct list_head * curlist;
+	struct block* split_block;
+	for(i=0;i<mb->order;i++)
+	{
+		//first fit
+		curlist = &(mb->avail_blocks[i]);
+		if(list_empty(curlist))
+			continue;
+		else
+		{
+			block = list_entry(list->next,block,block->link);
+			list_del(&block->link);
+			mark_allocated(mb,block);
+		}
+		while(block->order>order)
+		{
+			//split
+			split_block = (struct block *)((unsigned long)block + (1UL << (block->order)));
+			split_block->order = block->order;
+			//mark available
+			list_add(&(split_block->link));
+		}
+		return block		
+	}
+	return NULL;
+}
+
+struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
+{
+	
+}
  
 /*
 	helper: next power of 2
@@ -178,9 +234,15 @@ void mark_allocated(struct mem_buddy *mb, struct block *block){
   */
  
  void findBuddy(struct mem_buddy *mb, size_t size){
- 	
- 	//Uses linkedlist containing pair of buddies to locate buddy
- 	return buddy_addr;
+	unsigned long block, buddy;
+   	
+    	//make address 0 relative
+    	block = block - mb->addr;
+    
+    	//calculate buddy
+    	buddy= block ^ (1UL << size);
+    
+    	return buddy;
  }
   
 /**
