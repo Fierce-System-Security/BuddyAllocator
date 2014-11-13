@@ -129,6 +129,21 @@ size_t next_power_2(size_t size)
 	split the larger memory block into 2 buddy blocks
 */
 
+unsigned long address_index(struct mem_buddy *mb, struct block *block){
+	unsigned long block_index, block;
+	
+    block_index = (block - mb->addr) >> mb->min_size;
+    return block_index;
+}
+
+//uses macro set_bit
+void mark_free(struct mem_buddy *mb, struct block *block){
+	_set_bit(address_index(mb,block),mb->bit_availability);
+}
+
+void mark_allocated(struct mem_buddy *mb, struct block *block){
+	_clear_bit(address_index(mb, block), mb->bit_availability);
+}
 
 /* 
  * helper: checks availability of block
@@ -147,8 +162,7 @@ size_t next_power_2(size_t size)
  
  boolean availablity(void *block)
  {
- 	//shall we iterate through the linked list of free blocks to check this,
- 	//or shall we add a free flag into the metadata
+ 	return test_bit(address_index(mb,block), mb->bit_availability);
  }
  
  /**
@@ -217,27 +231,31 @@ mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
  
     struct mem_buddy *mb
     int i = 0;
+    unsigned long j =1;
     
     //Check that the minimum size of block is smaller than the order
     if(min_size > order){
     	return NULL;
     }
     
-    mb = alloc(size_t(struct mem_buddy));    //allocates for the buddy allocator
+    mb = malloc(size_t(struct mem_buddy));    //allocates for the buddy allocator
     mb->addr = addr;
     mb->order = order;
     mb->min_size = min_size;
     
     //Allocate linkedlist for every order
-    mp->avail_blocks = alloc(size_t(struct list_head));
-   
-    //Linked list for pairs of buddies
-    
+    mp->avail_blocks = malloc(size_t(struct list_head));
+  
     //List should be empty in the beginning
     for(i=0; i <=order;i++){
     	INIT_LIST_HEAD(&mb->avail_blocks[i]); //Gets and initializes list head * of linkedlist
     }
+    
+    //Allocates bitmap
+    mb->number_blocks = (j << order) /(j << min_size);
+    
+    //BITS_TO_LONGS file not included in .c file
+    mb->bit_availability = malloc(BITS_TO_LONGS(mb->number_blocks)*sizeof(long));
 
 	return mb;
 }
-    
