@@ -310,10 +310,9 @@ void free(void *ptr)
  * If this did not work, a null pointer is returned
  */
  
-struct mem_buddy *mb
-mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
+struct mem_buddy * mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
  
-    struct mem_buddy *mb
+    struct mem_buddy *mb;
     int i = 0;
     unsigned long j =1;
     
