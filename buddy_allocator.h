@@ -11,7 +11,7 @@ typedef struct _mem_buddy{
   unsigned long * bit_availability; 
   
   struct list_head *avail_blocks;
-  }mem_buddy;
+  };
   
 struct mem_buddy *
 mem_init(
