@@ -3,9 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
-/* struct ?? 2 linked lists? binary tree?
- * Possible implementations: 2 linked lists - one to manage free page blocks 
- * and one to manage the pairs of buddies 
+/* 
  * New implementation: One linked list, one bitmap
  */
 
@@ -103,7 +101,6 @@ void * alloc(size_t size)
     return chosen;
 } 
 
-
 struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 {
 	
@@ -143,9 +140,8 @@ void * malloc(struct mem_buddy *mb, unsigned long order)
 	{
 		//want to alloc a memory that's bigger than our current biggest buddy
 		//alloc a new buddy, merge the two buddies
-		struct mem_buddy *mb2
-mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
-
+		struct mem_buddy *mb2;
+		mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
 		mb = merge(struct mem_buddy *mb, struct mem_buddy *mb2);
 		
 	}
@@ -183,6 +179,11 @@ mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
 	return NULL;
 }
  
+
+/*
+	helper: merge
+	merge 2 free blocks together to make a bigger block
+*/
  
 /*
 	helper: split
@@ -235,13 +236,9 @@ void mark_allocated(struct mem_buddy *mb, struct block *block){
  *  been allocated, then false. 
  */
  
- /*
-	helper: availability
-	if the bit is set (alllocated), returns false. If free, returns true
-*/
- boolean availablity(void *block)
- {
- 	return test_bit(address_index(mb,block), mb->bit_availability);
+ int availablity(void *block)
+ 	//adds double negation to the test_bit so that only a 1/0 is returned
+ 	return test_bit(address_index(mb,block), mb->bit_availability) !! ( address_index(mb,block) & ( 1u << mb->bit_availability));
  }
  
  /**
@@ -260,7 +257,7 @@ void mark_allocated(struct mem_buddy *mb, struct block *block){
 	unsigned long block, buddy;
    	
     	//make address 0 relative
-    	block = block - mb->addr;
+    	block -= mb->addr;
     
     	//calculate buddy
     	buddy= block ^ (1UL << size);
@@ -292,13 +289,6 @@ void free(void *ptr)
 	
 	//then add metadata of ptr into the linked list
 }
-
-
-/*
-	helper: merge
-	merge 2 free blocks together to make a bigger block
-*/
-
 
 /**
  * Initializes a buddy allocator object
