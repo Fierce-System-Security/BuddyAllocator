@@ -6,6 +6,7 @@
 /* struct ?? 2 linked lists? binary tree?
  * Possible implementations: 2 linked lists - one to manage free page blocks 
  * and one to manage the pairs of buddies 
+ * New implementation: One linked list, one bitmap
  */
 
 /*
