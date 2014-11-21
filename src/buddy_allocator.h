@@ -22,7 +22,7 @@ typedef struct mem_buddy{
 } mem_buddy_t;
 
 int nk_mem_init(unsigned long size, unsigned long min_size);
-void * nk_malloc(struct mem_buddy *mb, unsigned long size);
+void * nk_malloc(unsigned long size);
 void nk_free( struct mem_buddy *mb, void *addr, unsigned long size);
 
 #endif

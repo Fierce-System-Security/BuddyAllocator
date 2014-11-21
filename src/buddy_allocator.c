@@ -202,8 +202,8 @@ void * nk_malloc(unsigned long size)
 		}
 		return block;		
 	}
-	return NULL;
 #endif
+	return NULL;
 }
 
  
