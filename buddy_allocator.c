@@ -44,7 +44,7 @@ metadata * freelist_head = NULL;
  * @see http://www.cplusplus.com/reference/clibrary/cstdlib/malloc/
  */
  
-void * alloc(size_t size)
+/*void * alloc(size_t size)
 {
 	//get the actual size that we are going to alloc
 	size_t realsize = next_power_2(size);
@@ -99,7 +99,7 @@ void * alloc(size_t size)
     	//use bst? or several linked lists with different size?
     }
     return chosen;
-} 
+} */
 
 struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 {
@@ -133,7 +133,7 @@ size_t next_power_2(size_t size)
 
 void * malloc(struct mem_buddy *mb, unsigned long order)
 {
-	if(mp==NULL)
+	if(mb==NULL)
 		return NULL;
 	
 	if(order>mb->order)
