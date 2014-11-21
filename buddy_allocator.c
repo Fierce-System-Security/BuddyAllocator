@@ -103,6 +103,17 @@ metadata * freelist_head = NULL;
 
 struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 {
+	mb->order+=1;
+	mb->number_blocks+=mb2->number_blocks;
+	int i;
+	for(i=0;i<mb->order-1;i++)
+	{
+		list_add(mb->avail_blocks[i],mb2->avail_blocks[i]);
+	}
+	INIT_LIST_HEAD(&mb->avail_blocks[i+1]);
+	//bit_availability
+	mb->bit_availability=realloc(sizeof(mb->bit_availability)+sizeof(mb2->bit_availability));
+	
 	
 }
  
@@ -174,7 +185,7 @@ void * malloc(struct mem_buddy *mb, unsigned long order)
 			//mark available
 			list_add(&(split_block->link));
 		}
-		return block		
+		return block;		
 	}
 	return NULL;
 }
@@ -318,7 +329,7 @@ struct mem_buddy * mem_init(unsigned long addr, unsigned long order, unsigned lo
     mb->min_size = min_size;
     
     //Allocate linkedlist for every order
-    mp->avail_blocks = malloc(size_t(struct list_head));
+    mp->avail_blocks = malloc(sizeof(struct list_head));
   
     //List should be empty in the beginning
     for(i=0; i <=order;i++){
