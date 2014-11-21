@@ -13,8 +13,8 @@ test1: test1.c buddy.o
 
 
 
-buddy.o: buddy.c buddy.h
-	$(COMPILER) $(COMPILER_OPTS) buddy.c -o buddy.o
+buddy.o: buddy_allocator.c buddy_allocator.h
+	$(COMPILER) $(COMPILER_OPTS) buddy_allocator.c -o buddy.o
 
 
 clean:
