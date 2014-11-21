@@ -1,43 +1,28 @@
 #ifndef _BUDDY_ALLOCATOR_H_
 #define _BUDDY_ALLOCATOR_H_
 
-#include <linux/list.h>
+#include "list.h"
 
-public:
-typedef struct _mem_buddy{
-  unsigned long addr;
-  unsigned long order;  
-  unsigned long min_size;
-  unsigned long number_blocks; 
-  unsigned long * bit_availability; 
-  
-  struct list_head *avail_blocks;
-  };
-  
-struct mem_buddy *
-mem_init(
-unsigned long addr,
-unsigned long order,
-unsigned long min_size
-);
+typedef unsigned long ul;
+typedef unsigned long long ull;
 
-void * malloc(
-struct mem_buddy *mb,
-unsigned long order
-);
+struct block {
+    unsigned long long link;
+    unsigned long size;
+    struct list_head list;
+} block_t;
 
-void free(
-struct mem_buddy *mb,
-void *addr,
-unsigned long order
-);
+typedef struct mem_buddy{
+    void * addr;
+    unsigned long size;  
+    unsigned long min_size;
+    unsigned long number_blocks; 
+    unsigned long * bit_availability; 
+    struct list_head avail_blocks;
+} mem_buddy_t;
 
-private:
-	size_t next_power_2(size_t size);
-	unsigned long address_index(struct mem_buddy *mb, struct block *block);
-	void mark_free(struct mem_buddy *mb, struct block *block);
-	void mark_allocated(struct mem_buddy *mb, struct block *block);
-	int availablity(void *block);
-	void findBuddy(struct mem_buddy *mb, size_t size);
+int nk_mem_init(unsigned long size, unsigned long min_size);
+void * nk_malloc(struct mem_buddy *mb, unsigned long size);
+void nk_free( struct mem_buddy *mb, void *addr, unsigned long size);
 
 #endif

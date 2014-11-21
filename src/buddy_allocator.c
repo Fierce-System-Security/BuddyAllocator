@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include "buddy_allocator.h"
+
+/* helper functions */
+size_t next_power_2(size_t size);
+unsigned long address_index(struct mem_buddy *mb, struct block *block);
+void mark_free(struct mem_buddy *mb, struct block *block);
+void mark_allocated(struct mem_buddy *mb, struct block *block);
+int availablity(void *block);
+void findBuddy(struct mem_buddy *mb, size_t size);
+
+/* Global Buddy Allocator State */
+struct mem_buddy mb;
 
 /* 
  * New implementation: One linked list, one bitmap
@@ -101,14 +113,15 @@ metadata * freelist_head = NULL;
     return chosen;
 } */
 
+#if 0
 struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 {
-	mb->order+=1;
-	mb->number_blocks+=mb2->number_blocks;
+	mb->order += 1;
+	mb->number_blocks += mb2->number_blocks;
 	int i;
-	for(i=0;i<mb->order-1;i++)
+	for(i=0; i < mb->order-1; i++)
 	{
-		list_add(mb->avail_blocks[i],mb2->avail_blocks[i]);
+		list_add(mb2->avail_blocks[i], mb->avail_blocks[i]);
 	}
 	INIT_LIST_HEAD(&mb->avail_blocks[i+1]);
 	//bit_availability
@@ -140,14 +153,12 @@ size_t next_power_2(size_t size)
 	//should we use bitwise operation?
 }
 
-
-
-void * malloc(struct mem_buddy *mb, unsigned long order)
+void * nk_malloc(unsigned long size)
 {
 	if(mb==NULL)
 		return NULL;
 	
-	if(order>mb->order)
+	if(size > mb->size)
 	{
 		//want to alloc a memory that's bigger than our current biggest buddy
 		//alloc a new buddy, merge the two buddies
@@ -156,6 +167,7 @@ void * malloc(struct mem_buddy *mb, unsigned long order)
 		mb = merge(struct mem_buddy *mb, struct mem_buddy *mb2);
 		
 	}
+
 	if(order<mb->min_size)
 	{
 		order=mb->min_size;
@@ -173,7 +185,7 @@ void * malloc(struct mem_buddy *mb, unsigned long order)
 			continue;
 		else
 		{
-			block = list_entry(list->next,block,block->link);
+			block = list_entry(list->next, block, block->link);
 			list_del(&block->link);
 			mark_allocated(mb,block);
 		}
@@ -189,7 +201,10 @@ void * malloc(struct mem_buddy *mb, unsigned long order)
 	}
 	return NULL;
 }
+
+#endif
  
+#if 0
 
 /*
 	helper: merge
@@ -290,7 +305,7 @@ void mark_allocated(struct mem_buddy *mb, struct block *block){
  *    passed as argument, no action occurs.
  */ 
  
-void free(void *ptr)
+void nk_free(void *ptr)
 {
 	if (!ptr)
 		return; 
@@ -300,6 +315,8 @@ void free(void *ptr)
 	
 	//then add metadata of ptr into the linked list
 }
+
+#endif 
 
 /**
  * Initializes a buddy allocator object
@@ -311,36 +328,35 @@ void free(void *ptr)
  * Pointer to initialized memory allocator
  * If this did not work, a null pointer is returned
  */
- 
-struct mem_buddy * mem_init(unsigned long addr, unsigned long order, unsigned long min_size){
- 
-    struct mem_buddy *mb;
+int 
+nk_mem_init(unsigned long size, unsigned long min_size)
+{
     int i = 0;
     unsigned long j =1;
     
     //Check that the minimum size of block is smaller than the order
-    if(min_size > order){
-    	return NULL;
+    if(min_size > size){
+    	return -1;
     }
     
-    mb = malloc(size_t(struct mem_buddy));    //allocates for the buddy allocator
-    mb->addr = addr;
-    mb->order = order;
-    mb->min_size = min_size;
+    /* allocate space for region using base 2 to the order */
+    mb.addr = (void *) malloc(size);
+    mb.size = size;
+    mb.min_size = min_size;
     
     //Allocate linkedlist for every order
-    mp->avail_blocks = malloc(sizeof(struct list_head));
+    //mp->avail_blocks = malloc(sizeof(struct list_head));
+    //struct block * baseBlock = (struct block *) malloc(sizeof(struct block));
   
     //List should be empty in the beginning
-    for(i=0; i <=order;i++){
-    	INIT_LIST_HEAD(&mb->avail_blocks[i]); //Gets and initializes list head * of linkedlist
-    }
+    //for(i=0; i <=order;i++){
+    INIT_LIST_HEAD(&(mb.avail_blocks)); //Gets and initializes list head * of linkedlist
+    //}
     
     //Allocates bitmap
-    mb->number_blocks = (j << order) /(j << min_size);
+    mb.number_blocks = size / min_size;
     
     //BITS_TO_LONGS file not included in .c file
-    mb->bit_availability = malloc(BITS_TO_LONGS(mb->number_blocks)*sizeof(long));
-
-	return mb;
+    mb.bit_availability = malloc(mb.number_blocks * sizeof(unsigned long));
+    return 1; 
 }
