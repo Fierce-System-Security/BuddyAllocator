@@ -153,8 +153,11 @@ size_t next_power_2(size_t size)
 	//should we use bitwise operation?
 }
 
+#endif
+
 void * nk_malloc(unsigned long size)
 {
+#if 0
 	if(mb==NULL)
 		return NULL;
 	
@@ -200,9 +203,9 @@ void * nk_malloc(unsigned long size)
 		return block;		
 	}
 	return NULL;
+#endif
 }
 
-#endif
  
 #if 0
 
