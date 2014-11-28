@@ -334,9 +334,7 @@ void nk_free(void *ptr)
 int 
 nk_mem_init(unsigned long size, unsigned long min_size)
 {
-    int i = 0;
-    unsigned long j =1;
-    
+
     //Check that the minimum size of block is smaller than the order
     if(min_size > size){
     	return -1;
@@ -352,14 +350,12 @@ nk_mem_init(unsigned long size, unsigned long min_size)
     //struct block * baseBlock = (struct block *) malloc(sizeof(struct block));
   
     //List should be empty in the beginning
-    //for(i=0; i <=order;i++){
     INIT_LIST_HEAD(&(mb.avail_blocks)); //Gets and initializes list head * of linkedlist
-    //}
+
     
     //Allocates bitmap
     mb.number_blocks = size / min_size;
     
-    //BITS_TO_LONGS file not included in .c file
     mb.bit_availability = malloc(mb.number_blocks * sizeof(unsigned long));
     return 1; 
 }
