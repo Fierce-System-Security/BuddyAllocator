@@ -116,9 +116,12 @@ metadata * freelist_head = NULL;
 #if 0
 struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 {
-	mb->order += 1;
+	//mb->order += 1;
+	mb-> size = next_power_2(size) * 2;
 	mb->number_blocks += mb2->number_blocks;
 	int i;
+	//expresses order in terms of specified block size - log2(next_power_2(size)*2)
+	int order = log(next_power_2(size)* 2)/log(2);
 	for(i=0; i < mb->order-1; i++)
 	{
 		list_add(mb2->avail_blocks[i], mb->avail_blocks[i]);
@@ -166,21 +169,21 @@ void * nk_malloc(unsigned long size)
 		//want to alloc a memory that's bigger than our current biggest buddy
 		//alloc a new buddy, merge the two buddies
 		struct mem_buddy *mb2;
-		mem_init((mb->addr)+(1UL<<(mb->order)), mb->order,mb->min_size);
+		mem_init(mb->size, mb->min_size);
 		mb = merge(struct mem_buddy *mb, struct mem_buddy *mb2);
 		
 	}
 
-	if(order<mb->min_size)
+	if(size<mb->min_size)
 	{
-		order=mb->min_size;
+		size=mb->min_size;
 	}
 	
 	unsigned long i;
 	struct block* block;
 	struct list_head * curlist;
 	struct block* split_block;
-	for(i=0;i<mb->order;i++)
+	for(i=0;i<mb->size;i++)
 	{
 		//first fit
 		curlist = &(mb->avail_blocks[i]);
@@ -192,11 +195,13 @@ void * nk_malloc(unsigned long size)
 			list_del(&block->link);
 			mark_allocated(mb,block);
 		}
-		while(block->order>order)
+		while(block->size>size)
 		{
 			//split
-			split_block = (struct block *)((unsigned long)block + (1UL << (block->order)));
-			split_block->order = block->order;
+			//split_block = (struct block *)((unsigned long)block + (1UL << (block->order)));
+			split_block = (struct block *)((unsigned long)block + (next_power_2(size));
+			//split_block->order = block->order;
+			split_block->size = block->size;
 			//mark available
 			list_add(&(split_block->link));
 		}
@@ -324,8 +329,7 @@ void nk_free(void *ptr)
 /**
  * Initializes a buddy allocator object
  *
- * Required: addr (address of the base memory block), order (size of 
- * memory block), min_size (minimum size of block)
+ * Required: size (size of memory block), min_size (minimum size of block)
  *
  *@return
  * Pointer to initialized memory allocator
