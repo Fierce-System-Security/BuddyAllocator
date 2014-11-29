@@ -122,7 +122,7 @@ struct mem_buddy * merge(struct mem_buddy *mb, struct mem_buddy *mb2)
 	int i;
 	//expresses order in terms of specified block size - log2(next_power_2(size)*2)
 	int order = log(next_power_2(size)* 2)/log(2);
-	for(i=0; i < mb->order-1; i++)
+	for(i=0; i < order-1; i++)
 	{
 		list_add(mb2->avail_blocks[i], mb->avail_blocks[i]);
 	}
